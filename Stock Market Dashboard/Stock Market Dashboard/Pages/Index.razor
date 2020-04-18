@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using Stock_Market_Dashboard.Data;
+@inject StockMarketService service;
 
 <h1>Stock Market Dashboard</h1>
 
@@ -6,7 +8,8 @@
 
 <LineChart @ref="lineChart" TItem="double" />
 
-@code{
+@code{   
+
     LineChart<double> lineChart;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -33,7 +36,7 @@
         return new LineChartDataset<double>
         {
             Label = "# of randoms",
-            Data = RandomizeData(),
+            Data = new List<double>() { service.GetStockMarketDataForCompanyAsync("AAPL").Result.pc, service.GetStockMarketDataForCompanyAsync("AAPL").Result.c },//RandomizeData(),
             BackgroundColor = backgroundColors,
             BorderColor = borderColors,
             Fill = true,
