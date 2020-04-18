@@ -35,7 +35,7 @@ namespace Stock_Market_Dashboard
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IWebHostEnvironment env, IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         { 
             if (env.IsDevelopment())
             {
