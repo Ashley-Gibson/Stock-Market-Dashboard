@@ -12,10 +12,14 @@
 
     LineChart<double> lineChart;
 
+    List<double> companyPriceData = new List<double>();
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            StockMarketResponse stockMarketData = await service.GetStockMarketDataForCompanyAsync("AAPL");
+            companyPriceData = new List<double>() { stockMarketData.pc, stockMarketData.c };
             await HandleRedraw();
         }
     }
@@ -36,7 +40,7 @@
         return new LineChartDataset<double>
         {
             Label = "# of randoms",
-            Data = new List<double>() { service.GetStockMarketDataForCompanyAsync("AAPL").Result.pc, service.GetStockMarketDataForCompanyAsync("AAPL").Result.c },//RandomizeData(),
+            Data = companyPriceData,//RandomizeData(),
             BackgroundColor = backgroundColors,
             BorderColor = borderColors,
             Fill = true,
