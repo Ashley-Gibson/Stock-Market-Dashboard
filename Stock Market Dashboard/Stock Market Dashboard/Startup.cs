@@ -23,9 +23,18 @@ namespace Stock_Market_Dashboard
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.WithOrigins("https://finnhub.io/");
+                    });
+            });
+
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
+            services.AddSingleton<StockMarketService>();
             services.AddBlazorise(options =>
             {
                 options.ChangeTextOnKeyPress = true; // optional
@@ -51,6 +60,8 @@ namespace Stock_Market_Dashboard
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.ApplicationServices
               .UseBootstrapProviders()
