@@ -15,43 +15,43 @@
         <Switch TValue="bool" Checked="@microsoft" CheckedChanged="@OnMicrosoftChanged">Microsoft</Switch>
         <Switch TValue="bool" Checked="@sony" CheckedChanged="@OnSonyChanged">Sony</Switch>
 
-        <Button Clicked="@(async () => await HandleRedraw())">Refresh</Button>
+        <Button Clicked="@(async () => await HandleRedraw(lineChart))">Refresh</Button>
     </CardBody>
 </Card>
 
-<LineChart @ref="lineChart" TItem="DataPoint" />
+<LineChart @ref="lineChart" TItem="DataPoint" OptionsObject="@lineChartOptions" />
 
 @code{
-    bool amazon;
-    bool apple;
-    bool google;
-    bool microsoft;
-    bool sony;
+    bool amazon = true;
+    bool apple = false;
+    bool google = false;
+    bool microsoft = false;
+    bool sony = false;
 
     async void OnAmazonChanged(bool value)
     {
         amazon = value;
-        await HandleRedraw();
+        await HandleRedraw(lineChart);
     }
     async void OnAppleChanged(bool value)
     {
         amazon = value;
-        await HandleRedraw();
+        await HandleRedraw(lineChart);
     }
     async void OnGoogleChanged(bool value)
     {
         amazon = value;
-        await HandleRedraw();
+        await HandleRedraw(lineChart);
     }
     async void OnMicrosoftChanged(bool value)
     {
         amazon = value;
-        await HandleRedraw();
+        await HandleRedraw(lineChart);
     }
     async void OnSonyChanged(bool value)
     {
         amazon = value;
-        await HandleRedraw();
+        await HandleRedraw(lineChart);
     }
 
     public struct DataPoint
@@ -67,11 +67,56 @@
 
     List<string> companies = new List<string>();
 
+    string[] timestamps = {};
+
     StockMarketResponse stockMarketDataAmazon;
     StockMarketResponse stockMarketDataApple;
     StockMarketResponse stockMarketDataGoogle;
     StockMarketResponse stockMarketDataMicrosoft;
     StockMarketResponse stockMarketDataSony;
+
+    List<string> backgroundColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), ChartColor.FromRgba(54, 162, 235, 0.2f), ChartColor.FromRgba(255, 206, 86, 0.2f), ChartColor.FromRgba(75, 192, 192, 0.2f), ChartColor.FromRgba(153, 102, 255, 0.2f), ChartColor.FromRgba(255, 159, 64, 0.2f) };
+    List<string> borderColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
+
+    object lineChartOptions = new
+    {
+        Title = new
+        {
+            Display = true,
+            Text = "Stock Market Line Chart"
+        },
+        Scales = new
+        {
+            XAxes = new object[]
+            {
+                new {
+                    ScaleLabel = new
+                    {
+                        Display = true, LabelString = "Date"
+                    }
+                }
+            },
+            YAxes = new object[]
+            {
+                new {
+                    ScaleLabel = new
+                    {
+                        Display = true, LabelString = "Price"
+                    }
+                }
+            }
+        },
+        Tooltips = new
+        {
+            Mode = "nearest",
+            Intersect = false
+        },
+        Hover = new
+        {
+            Mode = "nearest",
+            Intersect = false
+        }
+    };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -82,23 +127,25 @@
             stockMarketDataGoogle = await service.GetStockMarketDataForCompanyAsync("GOOGL");
             stockMarketDataMicrosoft = await service.GetStockMarketDataForCompanyAsync("MSFT");
             stockMarketDataSony = await service.GetStockMarketDataForCompanyAsync("SNE");
+
+            await Task.WhenAll(HandleRedraw(lineChart));
         }
-
-        await HandleRedraw();
-
     }
 
-    async Task HandleRedraw()
+    async Task HandleRedraw<TDataSet, TItem, TOptions, TModel>(BaseChart<TDataSet, TItem, TOptions, TModel> chart)
+        where TDataSet : ChartDataset<TItem>
+        where TOptions : ChartOptions
+        where TModel : ChartModel
     {
         await lineChart.Clear();
 
-        await lineChart.AddLabel(Labels);
+        await lineChart.AddLabel(timestamps);
 
         CheckDataSetVisibility();
 
-        foreach (var company in companies)
+        foreach (string company in companies)
         {
-            await lineChart.AddDataSet(GetLineChartDataset());
+            await lineChart.AddDataSet(GetLineChartDataset(company));
         }
 
         await lineChart.Update();
@@ -110,8 +157,6 @@
 
         if (amazon)
         {
-            companyPriceDataPoint = new DataPoint();
-
             companyPriceDataPoint.X = stockMarketDataAmazon.pc;
             companyPriceDataPoint.Y = DateTime.Now.AddDays(-1);
             companyPriceDataPoints.Add(companyPriceDataPoint);
@@ -123,11 +168,19 @@
             companies.Add("Amazon");
         }
         else
+        {
+            companyPriceDataPoint.X = stockMarketDataAmazon.pc;
+            companyPriceDataPoint.Y = DateTime.Now.AddDays(-1);
+            companyPriceDataPoints.Remove(companyPriceDataPoint);
+
+            companyPriceDataPoint.X = stockMarketDataAmazon.c;
+            companyPriceDataPoint.Y = DateTime.Now;
+            companyPriceDataPoints.Remove(companyPriceDataPoint);
+
             companies.Remove("Amazon");
+        }
         if (apple)
         {
-            companyPriceDataPoint = new DataPoint();
-
             companyPriceDataPoint.X = stockMarketDataApple.pc;
             companyPriceDataPoint.Y = DateTime.Now.AddDays(-1);
             companyPriceDataPoints.Add(companyPriceDataPoint);
@@ -139,11 +192,19 @@
             companies.Add("Apple");
         }
         else
+        {
+            companyPriceDataPoint.X = stockMarketDataApple.pc;
+            companyPriceDataPoint.Y = DateTime.Now.AddDays(-1);
+            companyPriceDataPoints.Remove(companyPriceDataPoint);
+
+            companyPriceDataPoint.X = stockMarketDataApple.c;
+            companyPriceDataPoint.Y = DateTime.Now;
+            companyPriceDataPoints.Remove(companyPriceDataPoint);
+
             companies.Remove("Apple");
+        }
         if (google)
         {
-            companyPriceDataPoint = new DataPoint();
-
             companyPriceDataPoint.X = stockMarketDataGoogle.pc;
             companyPriceDataPoint.Y = DateTime.Now.AddDays(-1);
             companyPriceDataPoints.Add(companyPriceDataPoint);
@@ -155,11 +216,19 @@
             companies.Add("Google");
         }
         else
+        {
+            companyPriceDataPoint.X = stockMarketDataGoogle.pc;
+            companyPriceDataPoint.Y = DateTime.Now.AddDays(-1);
+            companyPriceDataPoints.Remove(companyPriceDataPoint);
+
+            companyPriceDataPoint.X = stockMarketDataGoogle.c;
+            companyPriceDataPoint.Y = DateTime.Now;
+            companyPriceDataPoints.Remove(companyPriceDataPoint);
+
             companies.Remove("Google");
+        }
         if (microsoft)
         {
-            companyPriceDataPoint = new DataPoint();
-
             companyPriceDataPoint.X = stockMarketDataMicrosoft.pc;
             companyPriceDataPoint.Y = DateTime.Now.AddDays(-1);
             companyPriceDataPoints.Add(companyPriceDataPoint);
@@ -171,11 +240,19 @@
             companies.Add("Microsoft");
         }
         else
+        {
+            companyPriceDataPoint.X = stockMarketDataMicrosoft.pc;
+            companyPriceDataPoint.Y = DateTime.Now.AddDays(-1);
+            companyPriceDataPoints.Remove(companyPriceDataPoint);
+
+            companyPriceDataPoint.X = stockMarketDataMicrosoft.c;
+            companyPriceDataPoint.Y = DateTime.Now;
+            companyPriceDataPoints.Remove(companyPriceDataPoint);
+
             companies.Remove("Microsoft");
+        }
         if (sony)
         {
-            companyPriceDataPoint = new DataPoint();
-
             companyPriceDataPoint.X = stockMarketDataSony.pc;
             companyPriceDataPoint.Y = DateTime.Now.AddDays(-1);
             companyPriceDataPoints.Add(companyPriceDataPoint);
@@ -187,15 +264,25 @@
             companies.Add("Sony");
         }
         else
+        {
+            companyPriceDataPoint.X = stockMarketDataSony.pc;
+            companyPriceDataPoint.Y = DateTime.Now.AddDays(-1);
+            companyPriceDataPoints.Remove(companyPriceDataPoint);
+
+            companyPriceDataPoint.X = stockMarketDataSony.c;
+            companyPriceDataPoint.Y = DateTime.Now;
+            companyPriceDataPoints.Remove(companyPriceDataPoint);
+
             companies.Remove("Sony");
+        }
     }
 
-    LineChartDataset<DataPoint> GetLineChartDataset()
+    LineChartDataset<DataPoint> GetLineChartDataset(string company)
     {
         return new LineChartDataset<DataPoint>
         {
-            Label = "# of stocks",
-            Data = companyPriceDataPoints,//RandomizeData(),
+            Label = company,
+            Data = companyPriceDataPoints,
             BackgroundColor = backgroundColors,
             BorderColor = borderColors,
             Fill = true,
@@ -203,15 +290,4 @@
             BorderDash = new List<int> { }
         };
     }
-
-    string[] Labels = { "Amazon", "Apple", "Google", "Microsoft", "Sony" };
-    List<string> backgroundColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), ChartColor.FromRgba(54, 162, 235, 0.2f), ChartColor.FromRgba(255, 206, 86, 0.2f), ChartColor.FromRgba(75, 192, 192, 0.2f), ChartColor.FromRgba(153, 102, 255, 0.2f), ChartColor.FromRgba(255, 159, 64, 0.2f) };
-    List<string> borderColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
-
-    //List<double> RandomizeData()
-    //{
-    //    var r = new Random(DateTime.Now.Millisecond);
-
-    //    return new List<double> { r.Next(3, 50) * r.NextDouble(), r.Next(3, 50) * r.NextDouble(), r.Next(3, 50) * r.NextDouble(), r.Next(3, 50) * r.NextDouble(), r.Next(3, 50) * r.NextDouble(), r.Next(3, 50) * r.NextDouble() };
-    //}
 }
