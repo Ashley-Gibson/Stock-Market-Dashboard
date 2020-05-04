@@ -22,73 +22,79 @@
 <LineChart @ref="lineChart" TItem="DataPoint" OptionsObject="@lineChartOptions" />
 
 @code{
-        bool amazon = true;
-        bool apple = false;
-        bool google = false;
-        bool microsoft = false;
-        bool sony = false;
+    bool amazon = true;
+    bool apple = false;
+    bool google = false;
+    bool microsoft = false;
+    bool sony = false;
 
-        async void OnAmazonChanged(bool value)
+    const string amazonCodeName = "AMZN";
+    const string appleCodeName = "AAPL";
+    const string googleCodeName = "GOOGL";
+    const string microsoftCodeName = "MSFT";
+    const string sonyCodeName = "SNE";
+
+    async void OnAmazonChanged(bool value)
+    {
+        amazon = value;
+        await HandleRedraw(lineChart);
+    }
+    async void OnAppleChanged(bool value)
+    {
+        apple = value;
+        await HandleRedraw(lineChart);
+    }
+    async void OnGoogleChanged(bool value)
+    {
+        google = value;
+        await HandleRedraw(lineChart);
+    }
+    async void OnMicrosoftChanged(bool value)
+    {
+        microsoft = value;
+        await HandleRedraw(lineChart);
+    }
+    async void OnSonyChanged(bool value)
+    {
+        sony = value;
+        await HandleRedraw(lineChart);
+    }
+
+    public struct DataPoint
+    {
+        public object X { get; set; }
+
+        public object Y { get; set; }
+    }
+
+    LineChart<DataPoint> lineChart;
+
+    List<DataPoint> companyPriceDataPoints = new List<DataPoint>();
+
+    List<string> companies = new List<string>();
+
+    List<string> timestamps =new List<string>();
+
+    StockMarketResponse stockMarketDataAmazon;
+    StockMarketResponse stockMarketDataApple;
+    StockMarketResponse stockMarketDataGoogle;
+    StockMarketResponse stockMarketDataMicrosoft;
+    StockMarketResponse stockMarketDataSony;
+
+    List<string> backgroundColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), ChartColor.FromRgba(54, 162, 235, 0.2f), ChartColor.FromRgba(255, 206, 86, 0.2f), ChartColor.FromRgba(75, 192, 192, 0.2f), ChartColor.FromRgba(153, 102, 255, 0.2f), ChartColor.FromRgba(255, 159, 64, 0.2f) };
+    List<string> borderColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
+
+    object lineChartOptions = new
+    {
+        Title = new
         {
-            amazon = value;
-            await HandleRedraw(lineChart);
-        }
-        async void OnAppleChanged(bool value)
+            Display = true,
+            Text = "Stock Market Line Chart"
+        },
+        Scales = new
         {
-            apple = value;
-            await HandleRedraw(lineChart);
-        }
-        async void OnGoogleChanged(bool value)
-        {
-            google = value;
-            await HandleRedraw(lineChart);
-        }
-        async void OnMicrosoftChanged(bool value)
-        {
-            microsoft = value;
-            await HandleRedraw(lineChart);
-        }
-        async void OnSonyChanged(bool value)
-        {
-            sony = value;
-            await HandleRedraw(lineChart);
-        }
-
-        public struct DataPoint
-        {
-            public object X { get; set; }
-
-            public object Y { get; set; }
-        }
-
-        LineChart<DataPoint> lineChart;
-
-        List<DataPoint> companyPriceDataPoints = new List<DataPoint>();
-
-        List<string> companies = new List<string>();
-
-        string[] timestamps = { DateTime.Now.AddDays(-1).ToShortDateString(), DateTime.Now.ToShortDateString() };
-
-        StockMarketResponse stockMarketDataAmazon;
-        StockMarketResponse stockMarketDataApple;
-        StockMarketResponse stockMarketDataGoogle;
-        StockMarketResponse stockMarketDataMicrosoft;
-        StockMarketResponse stockMarketDataSony;
-
-        List<string> backgroundColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), ChartColor.FromRgba(54, 162, 235, 0.2f), ChartColor.FromRgba(255, 206, 86, 0.2f), ChartColor.FromRgba(75, 192, 192, 0.2f), ChartColor.FromRgba(153, 102, 255, 0.2f), ChartColor.FromRgba(255, 159, 64, 0.2f) };
-        List<string> borderColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
-
-        object lineChartOptions = new
-        {
-            Title = new
+            XAxes = new object[]
             {
-                Display = true,
-                Text = "Stock Market Line Chart"
-            },
-            Scales = new
-            {
-                XAxes = new object[]
-                {
                     new {
                         ScaleLabel = new
                         {
@@ -96,8 +102,8 @@
                         }
                     }
                 },
-                YAxes = new object[]
-                {
+            YAxes = new object[]
+            {
                     new {
                         ScaleLabel = new
                         {
@@ -105,31 +111,42 @@
                         }
                     }
                 }
-            },
-            Tooltips = new
-            {
-                Mode = "nearest",
-                Intersect = false
-            },
-            Hover = new
-            {
-                Mode = "nearest",
-                Intersect = false
-            }
-        };
+        },
+        Tooltips = new
+        {
+            Mode = "nearest",
+            Intersect = false
+        },
+        Hover = new
+        {
+            Mode = "nearest",
+            Intersect = false
+        }
+    };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        DateTime startDate = DateTime.Now.AddDays(-7);
+        DateTime endDate = DateTime.Now;
+
         if (firstRender)
         {
-            stockMarketDataAmazon = await service.GetStockMarketDataForCompanyAsync("AMZN");
-            stockMarketDataApple = await service.GetStockMarketDataForCompanyAsync("AAPL");
-            stockMarketDataGoogle = await service.GetStockMarketDataForCompanyAsync("GOOGL");
-            stockMarketDataMicrosoft = await service.GetStockMarketDataForCompanyAsync("MSFT");
-            stockMarketDataSony = await service.GetStockMarketDataForCompanyAsync("SNE");
+            stockMarketDataAmazon = await service.GetStockMarketDataForCompanyAsync(amazonCodeName, startDate, endDate);
+            stockMarketDataApple = await service.GetStockMarketDataForCompanyAsync(appleCodeName, startDate, endDate);
+            stockMarketDataGoogle = await service.GetStockMarketDataForCompanyAsync(googleCodeName, startDate, endDate);
+            stockMarketDataMicrosoft = await service.GetStockMarketDataForCompanyAsync(microsoftCodeName, startDate, endDate);
+            stockMarketDataSony = await service.GetStockMarketDataForCompanyAsync(sonyCodeName, startDate, endDate);
+
+            GetTimestamps();
 
             await Task.WhenAll(HandleRedraw(lineChart));
         }
+    }
+
+    private void GetTimestamps()
+    {
+        foreach (var timestamp in stockMarketDataAmazon.t)
+            timestamps.Add(service.ConvertUnixToDate(timestamp).ToShortDateString());
     }
 
     async Task HandleRedraw<TDataSet, TItem, TOptions, TModel>(BaseChart<TDataSet, TItem, TOptions, TModel> chart)
@@ -139,13 +156,13 @@
     {
         await lineChart.Clear();
 
-        await lineChart.AddLabel(timestamps);
+        await lineChart.AddLabel(timestamps.Take(timestamps.Count / 100).ToArray());
 
         GetSelectedCompanies();
 
         foreach (string company in companies)
         {
-            List<DataPoint> data = CheckDataSetVisibility(company);
+            List<DataPoint> data = GetDataForCompany(company);
             await lineChart.AddDataSet(GetLineChartDataset(company, data));
         }
 
@@ -157,69 +174,62 @@
         companies = new List<string>();
 
         if (amazon)
-            companies.Add("Amazon");
+            companies.Add(amazonCodeName);
         if (apple)
-            companies.Add("Apple");
+            companies.Add(appleCodeName);
         if (google)
-            companies.Add("Google");
+            companies.Add(googleCodeName);
         if (microsoft)
-            companies.Add("Microsoft");
+            companies.Add(microsoftCodeName);
         if (sony)
-            companies.Add("Sony");
+            companies.Add(sonyCodeName);
     }
 
-    private List<DataPoint> CheckDataSetVisibility(string company)
+    private List<DataPoint> GetDataForCompany(string company)
     {
         DataPoint companyPriceDataPoint = new DataPoint();
 
-        companyPriceDataPoints = new List<DataPoint>();
-
-        switch(company)
+        switch (company)
         {
-            case "Amazon":
-                companyPriceDataPoint.X = DateTime.Now.AddDays(-1);
-                companyPriceDataPoint.Y = stockMarketDataAmazon.pc;
-                companyPriceDataPoints.Add(companyPriceDataPoint);
-
-                companyPriceDataPoint.X = DateTime.Now;
-                companyPriceDataPoint.Y = stockMarketDataAmazon.c;
-                companyPriceDataPoints.Add(companyPriceDataPoint);
+            case amazonCodeName:
+                for (int i = 0; i < stockMarketDataAmazon.c.Length; i += 100)
+                {
+                    companyPriceDataPoint.X = service.ConvertUnixToDate((long)stockMarketDataAmazon.t[i]).ToShortDateString();
+                    companyPriceDataPoint.Y = stockMarketDataAmazon.c[i];
+                    companyPriceDataPoints.Add(companyPriceDataPoint);
+                }
                 break;
-            case "Apple":
-                companyPriceDataPoint.X = DateTime.Now.AddDays(-1);
-                companyPriceDataPoint.Y = stockMarketDataApple.pc;
-                companyPriceDataPoints.Add(companyPriceDataPoint);
-
-                companyPriceDataPoint.X = DateTime.Now;
-                companyPriceDataPoint.Y = stockMarketDataApple.c;
-                companyPriceDataPoints.Add(companyPriceDataPoint);
+            case appleCodeName:
+                for (int i = 0; i < stockMarketDataApple.c.Length; i += 100)
+                {
+                    companyPriceDataPoint.X = service.ConvertUnixToDate((long)stockMarketDataApple.t[i]).ToShortDateString();
+                    companyPriceDataPoint.Y = stockMarketDataApple.c[i];
+                    companyPriceDataPoints.Add(companyPriceDataPoint);
+                }
                 break;
-            case "Google":
-                companyPriceDataPoint.X = DateTime.Now.AddDays(-1);
-                companyPriceDataPoint.Y = stockMarketDataGoogle.pc;
-                companyPriceDataPoints.Add(companyPriceDataPoint);
-
-                companyPriceDataPoint.X = DateTime.Now;
-                companyPriceDataPoint.Y = stockMarketDataGoogle.c;
-                companyPriceDataPoints.Add(companyPriceDataPoint);
+            case googleCodeName:
+                for (int i = 0; i < stockMarketDataGoogle.c.Length; i += 100)
+                {
+                    companyPriceDataPoint.X = service.ConvertUnixToDate((long)stockMarketDataGoogle.t[i]).ToShortDateString();
+                    companyPriceDataPoint.Y = stockMarketDataGoogle.c[i];
+                    companyPriceDataPoints.Add(companyPriceDataPoint);
+                }
                 break;
-            case "Microsoft":
-                companyPriceDataPoint.X = DateTime.Now.AddDays(-1);
-                companyPriceDataPoint.Y = stockMarketDataMicrosoft.pc;
-                companyPriceDataPoints.Add(companyPriceDataPoint);
-
-                companyPriceDataPoint.X = DateTime.Now;
-                companyPriceDataPoint.Y = stockMarketDataMicrosoft.c;
-                companyPriceDataPoints.Add(companyPriceDataPoint);
+            case microsoftCodeName:
+                for (int i = 0; i < stockMarketDataMicrosoft.c.Length; i += 100)
+                {
+                    companyPriceDataPoint.X = service.ConvertUnixToDate((long)stockMarketDataMicrosoft.t[i]).ToShortDateString();
+                    companyPriceDataPoint.Y = stockMarketDataMicrosoft.c[i];
+                    companyPriceDataPoints.Add(companyPriceDataPoint);
+                }
                 break;
-            case "Sony":
-                companyPriceDataPoint.X = DateTime.Now.AddDays(-1);
-                companyPriceDataPoint.Y = stockMarketDataSony.pc;
-                companyPriceDataPoints.Add(companyPriceDataPoint);
-
-                companyPriceDataPoint.X = DateTime.Now;
-                companyPriceDataPoint.Y = stockMarketDataSony.c;
-                companyPriceDataPoints.Add(companyPriceDataPoint);
+            case sonyCodeName:
+                for (int i = 0; i < stockMarketDataSony.c.Length; i += 100)
+                {
+                    companyPriceDataPoint.X = service.ConvertUnixToDate((long)stockMarketDataSony.t[i]).ToShortDateString();
+                    companyPriceDataPoint.Y = stockMarketDataSony.c[i];
+                    companyPriceDataPoints.Add(companyPriceDataPoint);
+                }
                 break;
         }
 
@@ -236,7 +246,7 @@
             BorderColor = borderColors,
             Fill = false,
             PointRadius = 2,
-            BorderDash = new List<int> { }            
+            BorderDash = new List<int> { }
         };
     }
 }
