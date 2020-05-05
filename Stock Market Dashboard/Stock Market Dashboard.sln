@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stock Market Dashboard", "Stock Market Dashboard\Stock Market Dashboard.csproj", "{AF0183FD-8816-44EE-8BA4-7578D9DBBE9C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stock Market Dashboard", "Stock Market Dashboard\Stock Market Dashboard.csproj", "{AF0183FD-8816-44EE-8BA4-7578D9DBBE9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extensions", "Entensions\Extensions.csproj", "{A6010AF5-4F59-4121-9079-176D555F0FA3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{AF0183FD-8816-44EE-8BA4-7578D9DBBE9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF0183FD-8816-44EE-8BA4-7578D9DBBE9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF0183FD-8816-44EE-8BA4-7578D9DBBE9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6010AF5-4F59-4121-9079-176D555F0FA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6010AF5-4F59-4121-9079-176D555F0FA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6010AF5-4F59-4121-9079-176D555F0FA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6010AF5-4F59-4121-9079-176D555F0FA3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
