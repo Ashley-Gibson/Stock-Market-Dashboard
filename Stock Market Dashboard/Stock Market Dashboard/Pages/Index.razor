@@ -1,24 +1,9 @@
-﻿@*https://github.com/stsrki/Blazorise/blob/master/Demos/Blazorise.Demo/Pages/Tests/LiveChartsPage.razor.cs*@
+﻿@page "/"
+@inherits StocksLineChartBase
 
-@page "/"
-@inherits IndexBase
+<h3>Stock Market Dashboard</h3>
 
-<h1>Stock Market Dashboard</h1>
-
-<Card>
-    <CardHeader>Settings</CardHeader>
-    <CardBody>
-        <Switch TValue="bool" Checked="@amazon" CheckedChanged="@OnAmazonChanged">Amazon</Switch>
-        <Switch TValue="bool" Checked="@apple" CheckedChanged="@OnAppleChanged">Apple</Switch>
-        <Switch TValue="bool" Checked="@google" CheckedChanged="@OnGoogleChanged">Google</Switch>
-        <Switch TValue="bool" Checked="@microsoft" CheckedChanged="@OnMicrosoftChanged">Microsoft</Switch>
-        <Switch TValue="bool" Checked="@sony" CheckedChanged="@OnSonyChanged">Sony</Switch>
-
-        <Button Clicked="@(async () => await HandleRedraw(lineChart))">Refresh</Button>
-    </CardBody>
-</Card>
-
-<LineChart @ref="lineChart" TItem="DataPoint" OptionsObject="@lineChartOptions" />
+<StocksLineChartBase />
 
 @code{
 

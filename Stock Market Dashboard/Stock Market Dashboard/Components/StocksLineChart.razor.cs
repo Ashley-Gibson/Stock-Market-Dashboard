@@ -1,5 +1,6 @@
 ﻿using Blazorise.Charts;
 using Extensions;
+using Microsoft.AspNetCore.Components;
 using Stock_Market_Dashboard.Data;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Stock_Market_Dashboard.Pages
 {
-    public class IndexBase
+    public class StocksLineChartBase : ComponentBase
     {
         protected bool amazon = true;
         protected bool apple = false;
@@ -21,15 +22,15 @@ namespace Stock_Market_Dashboard.Pages
         private const string microsoftCodeName = "MSFT";
         private const string sonyCodeName = "SNE";
 
-        protected LineChart<DataPoint> lineChart;
+        protected LineChart<DataPoint> lineChart = new LineChart<DataPoint>();
+
+        private readonly StockMarketService service = new StockMarketService();
 
         private List<DataPoint> companyPriceDataPoints = new List<DataPoint>();
 
         private List<string> companies = new List<string>();
 
-        private List<string> timestamps = new List<string>();
-
-        private StockMarketService service;
+        private readonly List<string> timestamps = new List<string>();        
 
         private StockMarketResponse stockMarketDataAmazon;
         private StockMarketResponse stockMarketDataApple;
@@ -37,9 +38,32 @@ namespace Stock_Market_Dashboard.Pages
         private StockMarketResponse stockMarketDataMicrosoft;
         private StockMarketResponse stockMarketDataSony;
 
-        private List<string> backgroundColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), ChartColor.FromRgba(54, 162, 235, 0.2f), ChartColor.FromRgba(255, 206, 86, 0.2f), ChartColor.FromRgba(75, 192, 192, 0.2f), ChartColor.FromRgba(153, 102, 255, 0.2f), ChartColor.FromRgba(255, 159, 64, 0.2f) };
-        private List<string> borderColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
-        private List<string> pointColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), ChartColor.FromRgba(54, 162, 235, 0.2f), ChartColor.FromRgba(255, 206, 86, 0.2f), ChartColor.FromRgba(75, 192, 192, 0.2f), ChartColor.FromRgba(153, 102, 255, 0.2f), ChartColor.FromRgba(255, 159, 64, 0.2f) };
+        private readonly List<string> backgroundColours = new List<string> 
+        { 
+            ChartColor.FromRgba(255, 99, 132, 0.2f), 
+            ChartColor.FromRgba(54, 162, 235, 0.2f), 
+            ChartColor.FromRgba(255, 206, 86, 0.2f), 
+            ChartColor.FromRgba(75, 192, 192, 0.2f), 
+            ChartColor.FromRgba(153, 102, 255, 0.2f), 
+            ChartColor.FromRgba(255, 159, 64, 0.2f) 
+        };
+        private readonly List<string> borderColours = new List<string> 
+        { 
+            ChartColor.FromRgba(255, 99, 132, 1f), 
+            ChartColor.FromRgba(54, 162, 235, 1f), 
+            ChartColor.FromRgba(255, 206, 86, 1f), 
+            ChartColor.FromRgba(75, 192, 192, 1f), 
+            ChartColor.FromRgba(153, 102, 255, 1f), 
+            ChartColor.FromRgba(255, 159, 64, 1f) 
+        };
+        private readonly List<string> pointColours = new List<string>
+        { 
+            ChartColor.FromRgba(255, 99, 132, 0.2f), 
+            ChartColor.FromRgba(54, 162, 235, 0.2f), 
+            ChartColor.FromRgba(255, 206, 86, 0.2f), 
+            ChartColor.FromRgba(75, 192, 192, 0.2f), 
+            ChartColor.FromRgba(153, 102, 255, 0.2f), 
+            ChartColor.FromRgba(255, 159, 64, 0.2f) };
 
         protected async void OnAmazonChanged(bool value)
         {
@@ -84,7 +108,7 @@ namespace Stock_Market_Dashboard.Pages
             Scales = new
             {
                 XAxes = new object[]
-            {
+                {
                     new {
                         ScaleLabel = new
                         {
@@ -93,7 +117,7 @@ namespace Stock_Market_Dashboard.Pages
                     }
                 },
                 YAxes = new object[]
-            {
+                {
                     new {
                         ScaleLabel = new
                         {
@@ -114,13 +138,13 @@ namespace Stock_Market_Dashboard.Pages
             }
         };
 
-        protected async Task OnAfterRenderAsync(bool firstRender)
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             DateTime startDate = DateTime.Now.AddDays(-7);
             DateTime endDate = DateTime.Now;
 
             if (firstRender)
-            {
+            {              
                 stockMarketDataAmazon = await service.GetStockMarketDataForCompanyAsync(amazonCodeName, startDate, endDate);
                 stockMarketDataApple = await service.GetStockMarketDataForCompanyAsync(appleCodeName, startDate, endDate);
                 stockMarketDataGoogle = await service.GetStockMarketDataForCompanyAsync(googleCodeName, startDate, endDate);
@@ -153,8 +177,8 @@ namespace Stock_Market_Dashboard.Pages
             int colourIndex = 0;
             foreach (string company in companies)
             {
-                List<DataPoint> data = GetDataForCompany(company);
-                await lineChart.AddDataSet(GetLineChartDataset(company, data, colourIndex));
+                GetDataForCompany(company);
+                await lineChart.AddDataSet(GetLineChartDataset(company, colourIndex));
                 colourIndex++;
             }
 
@@ -163,7 +187,8 @@ namespace Stock_Market_Dashboard.Pages
 
         private void GetSelectedCompanies()
         {
-            companies = new List<string>();
+            companies = new List<string>
+                ();
 
             if (amazon)
                 companies.Add(amazonCodeName);
@@ -177,10 +202,11 @@ namespace Stock_Market_Dashboard.Pages
                 companies.Add(sonyCodeName);
         }
 
-        private List<DataPoint> GetDataForCompany(string company)
+        private void GetDataForCompany(string company)
         {
             DataPoint companyPriceDataPoint = new DataPoint();
-            companyPriceDataPoints = new List<DataPoint>();
+            companyPriceDataPoints = new List<DataPoint>
+                ();
 
             switch (company)
             {
@@ -225,24 +251,24 @@ namespace Stock_Market_Dashboard.Pages
                     }
                     break;
             }
-
-            return companyPriceDataPoints;
         }
 
-        protected LineChartDataset<DataPoint> GetLineChartDataset(string company, List<DataPoint> data, int colourIndex)
+        protected LineChartDataset<DataPoint>
+            GetLineChartDataset(string company, int colourIndex)
         {
             return new LineChartDataset<DataPoint>
             {
                 Label = company,
                 Data = companyPriceDataPoints,
-                BackgroundColor = backgroundColors[colourIndex],
-                BorderColor = borderColors[colourIndex],
+                BackgroundColor = backgroundColours[colourIndex],
+                BorderColor = borderColours[colourIndex],
                 Fill = false,
                 PointRadius = 2,
-                BorderDash = new List<int> { },
+                BorderDash = new List<int>
+                { },
                 LineTension = 0.0f,
-                PointBackgroundColor = pointColors,
-                PointBorderColor = pointColors
+                PointBackgroundColor = pointColours,
+                PointBorderColor = pointColours
             };
         }
     }

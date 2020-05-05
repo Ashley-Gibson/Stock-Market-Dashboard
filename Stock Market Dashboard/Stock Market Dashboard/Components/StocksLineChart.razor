@@ -1,0 +1,16 @@
+﻿@inherits Stock_Market_Dashboard.Pages.StocksLineChartBase
+
+<Card>
+    <CardHeader>Settings</CardHeader>
+    <CardBody>
+        <Switch TValue="bool" Checked="@amazon" CheckedChanged="@OnAmazonChanged">Amazon</Switch>
+        <Switch TValue="bool" Checked="@apple" CheckedChanged="@OnAppleChanged">Apple</Switch>
+        <Switch TValue="bool" Checked="@google" CheckedChanged="@OnGoogleChanged">Google</Switch>
+        <Switch TValue="bool" Checked="@microsoft" CheckedChanged="@OnMicrosoftChanged">Microsoft</Switch>
+        <Switch TValue="bool" Checked="@sony" CheckedChanged="@OnSonyChanged">Sony</Switch>
+
+        <Button Clicked="@(async () => await HandleRedraw(lineChart))">Refresh</Button>
+    </CardBody>
+</Card>
+
+<LineChart @ref="lineChart" TItem="DataPoint" OptionsObject="@lineChartOptions" />
