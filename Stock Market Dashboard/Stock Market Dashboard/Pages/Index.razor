@@ -156,7 +156,7 @@
     {
         await lineChart.Clear();
 
-        await lineChart.AddLabel(timestamps.Take(timestamps.Count / 100).ToArray());
+        await lineChart.AddLabel(timestamps.ToArray());
 
         GetSelectedCompanies();
 
@@ -192,7 +192,7 @@
         switch (company)
         {
             case amazonCodeName:
-                for (int i = 0; i < stockMarketDataAmazon.c.Length; i += 100)
+                for (int i = 0; i < stockMarketDataAmazon.c.Length; i++)
                 {
                     companyPriceDataPoint.X = service.ConvertUnixToDate((long)stockMarketDataAmazon.t[i]).ToShortDateString();
                     companyPriceDataPoint.Y = stockMarketDataAmazon.c[i];
@@ -200,7 +200,7 @@
                 }
                 break;
             case appleCodeName:
-                for (int i = 0; i < stockMarketDataApple.c.Length; i += 100)
+                for (int i = 0; i < stockMarketDataApple.c.Length; i++)
                 {
                     companyPriceDataPoint.X = service.ConvertUnixToDate((long)stockMarketDataApple.t[i]).ToShortDateString();
                     companyPriceDataPoint.Y = stockMarketDataApple.c[i];
@@ -208,7 +208,7 @@
                 }
                 break;
             case googleCodeName:
-                for (int i = 0; i < stockMarketDataGoogle.c.Length; i += 100)
+                for (int i = 0; i < stockMarketDataGoogle.c.Length; i++)
                 {
                     companyPriceDataPoint.X = service.ConvertUnixToDate((long)stockMarketDataGoogle.t[i]).ToShortDateString();
                     companyPriceDataPoint.Y = stockMarketDataGoogle.c[i];
@@ -216,7 +216,7 @@
                 }
                 break;
             case microsoftCodeName:
-                for (int i = 0; i < stockMarketDataMicrosoft.c.Length; i += 100)
+                for (int i = 0; i < stockMarketDataMicrosoft.c.Length; i++)
                 {
                     companyPriceDataPoint.X = service.ConvertUnixToDate((long)stockMarketDataMicrosoft.t[i]).ToShortDateString();
                     companyPriceDataPoint.Y = stockMarketDataMicrosoft.c[i];
@@ -224,7 +224,7 @@
                 }
                 break;
             case sonyCodeName:
-                for (int i = 0; i < stockMarketDataSony.c.Length; i += 100)
+                for (int i = 0; i < stockMarketDataSony.c.Length; i++)
                 {
                     companyPriceDataPoint.X = service.ConvertUnixToDate((long)stockMarketDataSony.t[i]).ToShortDateString();
                     companyPriceDataPoint.Y = stockMarketDataSony.c[i];
@@ -246,7 +246,8 @@
             BorderColor = borderColors,
             Fill = false,
             PointRadius = 2,
-            BorderDash = new List<int> { }
+            BorderDash = new List<int> { },
+            LineTension = 0.0f
         };
     }
 }

@@ -22,7 +22,7 @@ namespace Stock_Market_Dashboard.Data
             long startUnixTimestamp = ConvertDateToUnix(startDate);
             long endUnixTimestamp = ConvertDateToUnix(endDate);
             
-            return Webhook + "?symbol=" + companyCode + "&from=" + startUnixTimestamp + "&to=" + endUnixTimestamp + "&resolution=1&token=" + APIKey;
+            return Webhook + "?symbol=" + companyCode + "&from=" + startUnixTimestamp + "&to=" + endUnixTimestamp + "&resolution=D&token=" + APIKey;
         }
 
         private long ConvertDateToUnix(DateTime date)
