@@ -2,6 +2,7 @@
 
 @page "/"
 @using Stock_Market_Dashboard.Data
+@using Extensions
 @inject StockMarketService service
 
 <h1>Stock Market Dashboard</h1>
@@ -146,7 +147,7 @@
     private void GetTimestamps()
     {
         foreach (var timestamp in stockMarketDataAmazon.t)
-            timestamps.Add(service.ConvertUnixToDate(timestamp).ToShortDateString());
+            timestamps.Add(Conversions.ConvertUnixToDate(timestamp).ToShortDateString());
     }
 
     async Task HandleRedraw<TDataSet, TItem, TOptions, TModel>(BaseChart<TDataSet, TItem, TOptions, TModel> chart)
@@ -194,40 +195,40 @@
             case amazonCodeName:
                 for (int i = 0; i < stockMarketDataAmazon.c.Length; i++)
                 {
-                    companyPriceDataPoint.X = service.ConvertUnixToDate((long)stockMarketDataAmazon.t[i]).ToShortDateString();
-                    companyPriceDataPoint.Y = stockMarketDataAmazon.c[i];
+                    companyPriceDataPoint.X = Conversions.ConvertUnixToDate((long)stockMarketDataAmazon.t[i]).ToShortDateString();
+                    companyPriceDataPoint.Y = Math.Round(stockMarketDataAmazon.c[i], 2, MidpointRounding.AwayFromZero);
                     companyPriceDataPoints.Add(companyPriceDataPoint);
                 }
                 break;
             case appleCodeName:
                 for (int i = 0; i < stockMarketDataApple.c.Length; i++)
                 {
-                    companyPriceDataPoint.X = service.ConvertUnixToDate((long)stockMarketDataApple.t[i]).ToShortDateString();
-                    companyPriceDataPoint.Y = stockMarketDataApple.c[i];
+                    companyPriceDataPoint.X = Conversions.ConvertUnixToDate((long)stockMarketDataApple.t[i]).ToShortDateString();
+                    companyPriceDataPoint.Y = Math.Round(stockMarketDataApple.c[i], 2, MidpointRounding.AwayFromZero);
                     companyPriceDataPoints.Add(companyPriceDataPoint);
                 }
                 break;
             case googleCodeName:
                 for (int i = 0; i < stockMarketDataGoogle.c.Length; i++)
                 {
-                    companyPriceDataPoint.X = service.ConvertUnixToDate((long)stockMarketDataGoogle.t[i]).ToShortDateString();
-                    companyPriceDataPoint.Y = stockMarketDataGoogle.c[i];
+                    companyPriceDataPoint.X = Conversions.ConvertUnixToDate((long)stockMarketDataGoogle.t[i]).ToShortDateString();
+                    companyPriceDataPoint.Y = Math.Round(stockMarketDataGoogle.c[i], 2, MidpointRounding.AwayFromZero);
                     companyPriceDataPoints.Add(companyPriceDataPoint);
                 }
                 break;
             case microsoftCodeName:
                 for (int i = 0; i < stockMarketDataMicrosoft.c.Length; i++)
                 {
-                    companyPriceDataPoint.X = service.ConvertUnixToDate((long)stockMarketDataMicrosoft.t[i]).ToShortDateString();
-                    companyPriceDataPoint.Y = stockMarketDataMicrosoft.c[i];
+                    companyPriceDataPoint.X = Conversions.ConvertUnixToDate((long)stockMarketDataMicrosoft.t[i]).ToShortDateString();
+                    companyPriceDataPoint.Y = Math.Round(stockMarketDataMicrosoft.c[i], 2, MidpointRounding.AwayFromZero);
                     companyPriceDataPoints.Add(companyPriceDataPoint);
                 }
                 break;
             case sonyCodeName:
                 for (int i = 0; i < stockMarketDataSony.c.Length; i++)
                 {
-                    companyPriceDataPoint.X = service.ConvertUnixToDate((long)stockMarketDataSony.t[i]).ToShortDateString();
-                    companyPriceDataPoint.Y = stockMarketDataSony.c[i];
+                    companyPriceDataPoint.X = Conversions.ConvertUnixToDate((long)stockMarketDataSony.t[i]).ToShortDateString();
+                    companyPriceDataPoint.Y = Math.Round(stockMarketDataSony.c[i], 2, MidpointRounding.AwayFromZero);
                     companyPriceDataPoints.Add(companyPriceDataPoint);
                 }
                 break;
