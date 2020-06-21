@@ -8,29 +8,23 @@
         <Switch TValue="bool" Checked="@amazon" CheckedChanged="@OnAmazonChanged">Amazon</Switch>
         <Switch TValue="bool" Checked="@apple" CheckedChanged="@OnAppleChanged">Apple</Switch>
         <Switch TValue="bool" Checked="@google" CheckedChanged="@OnGoogleChanged">Google</Switch>
-        <Switch TValue="bool" Checked="@microsoft" CheckedChanged="@OnMicrosoftChanged">Microsoft</Switch>
-        <Switch TValue="bool" Checked="@sony" CheckedChanged="@OnSonyChanged">Sony</Switch>
 
         <Button Clicked="@(async () => await HandleRedraw(lineChart))">Refresh</Button>
     </CardBody>
 </Card>
 
-<LineChart @ref="lineChart" TItem="double" OptionsObject="@lineChartOptions" />
+<LineChart @ref="lineChart" TItem="DataPoint" OptionsObject="@lineChartOptions" />
 
 @code{
     protected bool amazon = true;
     protected bool apple = false;
     protected bool google = false;
-    protected bool microsoft = false;
-    protected bool sony = false;
 
     private const string amazonCodeName = "AMZN";
     private const string appleCodeName = "AAPL";
     private const string googleCodeName = "GOOGL";
-    private const string microsoftCodeName = "MSFT";
-    private const string sonyCodeName = "SNE";
 
-    protected LineChart<double> lineChart = new LineChart<double>();
+    protected LineChart<DataPoint> lineChart = new LineChart<DataPoint>();
 
     private readonly StockMarketService service = new StockMarketService();
 
@@ -86,16 +80,6 @@
     protected async void OnGoogleChanged(bool value)
     {
         google = value;
-        await HandleRedraw(lineChart);
-    }
-    protected async void OnMicrosoftChanged(bool value)
-    {
-        microsoft = value;
-        await HandleRedraw(lineChart);
-    }
-    protected async void OnSonyChanged(bool value)
-    {
-        sony = value;
         await HandleRedraw(lineChart);
     }
 
@@ -154,10 +138,8 @@
         if (firstRender)
         {
             stockMarketDataAmazon = await service.GetStockMarketDataForCompanyAsync(amazonCodeName, startDate, endDate);
-            //stockMarketDataApple = await service.GetStockMarketDataForCompanyAsync(appleCodeName, startDate, endDate);
-            //stockMarketDataGoogle = await service.GetStockMarketDataForCompanyAsync(googleCodeName, startDate, endDate);
-            //stockMarketDataMicrosoft = await service.GetStockMarketDataForCompanyAsync(microsoftCodeName, startDate, endDate);
-            //stockMarketDataSony = await service.GetStockMarketDataForCompanyAsync(sonyCodeName, startDate, endDate);
+            stockMarketDataApple = await service.GetStockMarketDataForCompanyAsync(appleCodeName, startDate, endDate);
+            stockMarketDataGoogle = await service.GetStockMarketDataForCompanyAsync(googleCodeName, startDate, endDate);
 
             GetTimestamps();
 
@@ -203,10 +185,6 @@
             companies.Add(appleCodeName);
         if (google)
             companies.Add(googleCodeName);
-        if (microsoft)
-            companies.Add(microsoftCodeName);
-        if (sony)
-            companies.Add(sonyCodeName);
     }
 
     private void GetDataForCompany(string company)
@@ -217,7 +195,7 @@
         switch (company)
         {
             case amazonCodeName:
-                for (int i = 0; i < stockMarketDataAmazon.c.Length; i++)
+                for (int i = 0; i < stockMarketDataAmazon.c.Length - 1; i++)
                 {
                     companyPriceDataPoint.X = Conversions.ConvertUnixToDate((long)stockMarketDataAmazon.t[i]).ToShortDateString();
                     companyPriceDataPoint.Y = Math.Round(stockMarketDataAmazon.c[i], 2, MidpointRounding.AwayFromZero);
@@ -225,7 +203,7 @@
                 }
                 break;
             case appleCodeName:
-                for (int i = 0; i < stockMarketDataApple.c.Length; i++)
+                for (int i = 0; i < stockMarketDataApple.c.Length - 1; i++)
                 {
                     companyPriceDataPoint.X = Conversions.ConvertUnixToDate((long)stockMarketDataApple.t[i]).ToShortDateString();
                     companyPriceDataPoint.Y = Math.Round(stockMarketDataApple.c[i], 2, MidpointRounding.AwayFromZero);
@@ -233,48 +211,30 @@
                 }
                 break;
             case googleCodeName:
-                for (int i = 0; i < stockMarketDataGoogle.c.Length; i++)
+                for (int i = 0; i < stockMarketDataGoogle.c.Length - 1; i++)
                 {
                     companyPriceDataPoint.X = Conversions.ConvertUnixToDate((long)stockMarketDataGoogle.t[i]).ToShortDateString();
                     companyPriceDataPoint.Y = Math.Round(stockMarketDataGoogle.c[i], 2, MidpointRounding.AwayFromZero);
                     companyPriceDataPoints.Add(companyPriceDataPoint);
                 }
                 break;
-            case microsoftCodeName:
-                for (int i = 0; i < stockMarketDataMicrosoft.c.Length; i++)
-                {
-                    companyPriceDataPoint.X = Conversions.ConvertUnixToDate((long)stockMarketDataMicrosoft.t[i]).ToShortDateString();
-                    companyPriceDataPoint.Y = Math.Round(stockMarketDataMicrosoft.c[i], 2, MidpointRounding.AwayFromZero);
-                    companyPriceDataPoints.Add(companyPriceDataPoint);
-                }
-                break;
-            case sonyCodeName:
-                for (int i = 0; i < stockMarketDataSony.c.Length; i++)
-                {
-                    companyPriceDataPoint.X = Conversions.ConvertUnixToDate((long)stockMarketDataSony.t[i]).ToShortDateString();
-                    companyPriceDataPoint.Y = Math.Round(stockMarketDataSony.c[i], 2, MidpointRounding.AwayFromZero);
-                    companyPriceDataPoints.Add(companyPriceDataPoint);
-                }
-                break;
         }
     }
 
-    protected LineChartDataset<double> GetLineChartDataset(string company, int dataPointIndex)
+    protected LineChartDataset<DataPoint> GetLineChartDataset(string company, int dataPointIndex)
     {
-        List<double> tempData = new List<double>() { 10.0, 5.0, 6.3, 6.5, 6.5, 6.7 };
-
-        return new LineChartDataset<double>
+        return new LineChartDataset<DataPoint>
         {
             Label = timestamps[dataPointIndex],
-            Data = tempData,//companyPriceDataPoints,
+            Data = companyPriceDataPoints,
             BackgroundColor = backgroundColours[dataPointIndex],
             BorderColor = borderColours[dataPointIndex],
             Fill = false,
             PointRadius = 2,
-            BorderDash = new List<int> { 1, 2, 3, 4, 5, 6, 7 }
-            //LineTension = 0.0f,
-            //PointBackgroundColor = pointColours,
-            //PointBorderColor = pointColours
+            BorderDash = new List<int> { 1, 2, 3, 4, 5, 6, 7 },
+            LineTension = 0.0f,
+            PointBackgroundColor = pointColours,
+            PointBorderColor = pointColours
         };
     }
 }
