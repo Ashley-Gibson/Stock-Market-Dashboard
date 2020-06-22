@@ -7,6 +7,26 @@
     </CardBody>
 </Card>
 
-@code{
+<Divider />
 
+<Card>
+    <CardHeader>Endpoints</CardHeader>
+    <CardBody>
+        <Alert Color="Color.Success" Visible="true">
+            <Heading Size="HeadingSize.Is4" TextColor="TextColor.Success">Stock Candles</Heading>
+            <Paragraph>
+                Get candlestick data for stocks going back 25 years for US stocks.
+            </Paragraph>
+            <Paragraph>
+                <Button Color="Color.Info" Clicked="@TestStockCandles">Test</Button>
+            </Paragraph>
+        </Alert>
+    </CardBody>
+</Card>
+
+@code{
+    private void TestStockCandles()
+    {
+
+    }
 }
