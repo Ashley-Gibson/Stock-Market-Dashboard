@@ -5,11 +5,14 @@
 <Card>
     <CardHeader>Settings</CardHeader>
     <CardBody>
-        <Switch TValue="bool" Checked="@amazon" CheckedChanged="@OnAmazonChanged">Amazon</Switch>
-        <Switch TValue="bool" Checked="@apple" CheckedChanged="@OnAppleChanged">Apple</Switch>
-        <Switch TValue="bool" Checked="@google" CheckedChanged="@OnGoogleChanged">Google</Switch>
+        <Paragraph Visibility="Visibility.Always" Style="display:flex;flex-direction:row;margin:auto;">
+            <Switch Style="padding-right: 20px;" TValue="bool" Checked="@amazon" CheckedChanged="@OnAmazonChanged">Amazon</Switch>
+            <Switch Style="padding-right: 20px;" TValue="bool" Checked="@apple" CheckedChanged="@OnAppleChanged">Apple</Switch>
+            <Switch TValue="bool" Checked="@google" CheckedChanged="@OnGoogleChanged">Google</Switch>
 
-        <Button Clicked="@(async () => await HandleRedraw(lineChart))">Refresh</Button>
+            <Button Style="margin-left:20px;padding:0;font-weight:bolder;" Clicked="@(async () => await HandleRedraw(lineChart))">Refresh</Button>
+        </Paragraph>
+        
     </CardBody>
 </Card>
 
@@ -94,7 +97,7 @@
     {
         Title = new
         {
-            Display = true,
+            Display = false,
             Text = "Stock Market Line Chart"
         },
         Scales = new
@@ -225,7 +228,7 @@
     {
         return new LineChartDataset<DataPoint>
         {
-            Label = timestamps[dataPointIndex],
+            Label = companies[dataPointIndex],
             Data = companyPriceDataPoints,
             BackgroundColor = backgroundColours[dataPointIndex],
             BorderColor = borderColours[dataPointIndex],
