@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stock Market Dashboard", "Stock Market Dashboard\Stock Market Dashboard.csproj", "{41E6A92A-C7AF-4568-B23C-EE6598FE55BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stock Market Dashboard", "Stock Market Dashboard\Stock Market Dashboard.csproj", "{41E6A92A-C7AF-4568-B23C-EE6598FE55BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extensions", "Extensions\Extensions.csproj", "{596AF5C8-D270-4EFF-9BD0-51B20AF6BE86}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extensions", "Extensions\Extensions.csproj", "{596AF5C8-D270-4EFF-9BD0-51B20AF6BE86}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
