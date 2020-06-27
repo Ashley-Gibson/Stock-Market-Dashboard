@@ -1,0 +1,20 @@
+﻿@inherits CompanyNewsFeedComponentBase
+
+<Tabs SelectedTab="@selectedTab" SelectedTabChanged="@OnSelectedTabChanged">
+    <Items>
+        <Tab Name="amazon">Amazon</Tab>
+        <Tab Name="apple">Apple</Tab>
+        <Tab Name="google">Google</Tab>
+    </Items>
+    <Content>
+        <TabPanel Name="gmazon">
+            Content for Amazon.
+        </TabPanel>
+        <TabPanel Name="apple">
+            Content for Apple.
+        </TabPanel>
+        <TabPanel Name="google">
+            Content for Google.
+        </TabPanel>
+    </Content>
+</Tabs>
