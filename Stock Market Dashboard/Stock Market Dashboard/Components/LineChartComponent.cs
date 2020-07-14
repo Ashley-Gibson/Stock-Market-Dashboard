@@ -13,7 +13,7 @@ namespace Stock_Market_Dashboard.Components
     {
         protected bool amazon = true;
         protected bool apple = false;
-        protected bool google = false;
+        protected bool google = true;
 
         private const string amazonCodeName = "AMZN";
         private const string appleCodeName = "AAPL";
@@ -51,29 +51,22 @@ namespace Stock_Market_Dashboard.Components
         ChartColor.FromRgba(153, 102, 255, 1f),
         ChartColor.FromRgba(255, 159, 64, 1f)
     };
-        private readonly List<string> pointColours = new List<string>
-{
-        ChartColor.FromRgba(255, 99, 132, 0.2f),
-        ChartColor.FromRgba(54, 162, 235, 0.2f),
-        ChartColor.FromRgba(255, 206, 86, 0.2f),
-        ChartColor.FromRgba(75, 192, 192, 0.2f),
-        ChartColor.FromRgba(153, 102, 255, 0.2f),
-        ChartColor.FromRgba(255, 159, 64, 0.2f) };
 
         protected async void OnAmazonChanged(bool value)
         {
             amazon = value;
-            await HandleRedraw(lineChart);
+            await Task.WhenAll(HandleRedraw());
+            
         }
         protected async void OnAppleChanged(bool value)
         {
             apple = value;
-            await HandleRedraw(lineChart);
+            await Task.WhenAll(HandleRedraw());
         }
         protected async void OnGoogleChanged(bool value)
         {
             google = value;
-            await HandleRedraw(lineChart);
+            await Task.WhenAll(HandleRedraw());
         }
 
         protected struct DataPoint
@@ -125,19 +118,19 @@ namespace Stock_Market_Dashboard.Components
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            DateTime startDate = DateTime.Now.AddDays(-7);
-            DateTime endDate = DateTime.Now;
-
             if (firstRender)
             {
+                DateTime startDate = DateTime.Now.AddDays(-7);
+                DateTime endDate = DateTime.Now;
+
                 stockMarketDataAmazon = await service.GetStockMarketDataForCompanyAsync(amazonCodeName, startDate, endDate);
                 stockMarketDataApple = await service.GetStockMarketDataForCompanyAsync(appleCodeName, startDate, endDate);
                 stockMarketDataGoogle = await service.GetStockMarketDataForCompanyAsync(googleCodeName, startDate, endDate);
 
                 GetTimestamps();
 
-                await Task.WhenAll(HandleRedraw(lineChart));
-            }
+                await Task.WhenAll(HandleRedraw());
+            }            
         }
 
         private void GetTimestamps()
@@ -146,26 +139,22 @@ namespace Stock_Market_Dashboard.Components
                 timestamps.Add(Conversions.ConvertUnixToDate(timestamp).ToShortDateString());
         }
 
-        protected async Task HandleRedraw<TDataSet, TItem, TOptions, TModel>(BaseChart<TDataSet, TItem, TOptions, TModel> chart)
-            where TDataSet : ChartDataset<TItem>
-            where TOptions : ChartOptions
-            where TModel : ChartModel
+        protected async Task HandleRedraw()
         {
-            await lineChart.Clear();
-
-            await lineChart.AddLabel(timestamps.ToArray());
+            await Task.WhenAll(lineChart.Clear());
 
             GetSelectedCompanies();
 
             int dataPointIndex = 0;
+            List<LineChartDataset<DataPoint>> datasets = new List<LineChartDataset<DataPoint>>();
             foreach (string company in companies)
             {
                 GetDataForCompany(company);
-                await lineChart.AddDataSet(GetLineChartDataset(company, dataPointIndex));
+                datasets.Add(GetLineChartDataset(dataPointIndex));
                 dataPointIndex++;
             }
 
-            await lineChart.Update();
+            await Task.WhenAll(lineChart.AddLabelsDatasetsAndUpdate(timestamps.ToArray(), datasets.ToArray()));
         }
 
         private void GetSelectedCompanies()
@@ -214,7 +203,7 @@ namespace Stock_Market_Dashboard.Components
             }
         }
 
-        protected LineChartDataset<DataPoint> GetLineChartDataset(string company, int dataPointIndex)
+        protected LineChartDataset<DataPoint> GetLineChartDataset(int dataPointIndex)
         {
             return new LineChartDataset<DataPoint>
             {
@@ -224,10 +213,7 @@ namespace Stock_Market_Dashboard.Components
                 BorderColor = borderColours[dataPointIndex],
                 Fill = false,
                 PointRadius = 2,
-                BorderDash = new List<int> { 1, 2, 3, 4, 5, 6, 7 },
-                LineTension = 0.0f,
-                PointBackgroundColor = pointColours,
-                PointBorderColor = pointColours
+                BorderDash = new List<int> { 1, 2, 3, 4, 5, 6, 7 }
             };
         }
     }
