@@ -21,7 +21,7 @@ namespace Stock_Market_Dashboard.Components
 
         protected LineChart<DataPoint> lineChart = new LineChart<DataPoint>();
 
-        private readonly StockMarketService service = new StockMarketService();
+        private readonly StockMarketServices service = new StockMarketServices();
 
         private List<DataPoint> companyPriceDataPoints = new List<DataPoint>();
 
@@ -29,9 +29,9 @@ namespace Stock_Market_Dashboard.Components
 
         private readonly List<string> timestamps = new List<string>();
 
-        private StockMarketResponse stockMarketDataAmazon;
-        private StockMarketResponse stockMarketDataApple;
-        private StockMarketResponse stockMarketDataGoogle;
+        private CompanyNewsResponse stockMarketDataAmazon;
+        private CompanyNewsResponse stockMarketDataApple;
+        private CompanyNewsResponse stockMarketDataGoogle;
 
         private readonly List<string> backgroundColours = new List<string>
 {
