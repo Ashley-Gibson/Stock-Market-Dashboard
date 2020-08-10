@@ -9,19 +9,9 @@ using Blazorise.Charts;
 
 namespace Stock_Market_Dashboard.Components
 {
-    public partial class LineChartComponentBase : ComponentBase
+    public partial class LineChartComponentBase : HomePageBase
     {
-        protected bool amazon = true;
-        protected bool apple = false;
-        protected bool google = true;
-
-        private const string amazonCodeName = "AMZN";
-        private const string appleCodeName = "AAPL";
-        private const string googleCodeName = "GOOGL";
-
         protected LineChart<DataPoint> lineChart = new LineChart<DataPoint>();
-
-        private readonly StockMarketServices service = new StockMarketServices();
 
         private List<DataPoint> companyPriceDataPoints = new List<DataPoint>();
 
@@ -29,9 +19,9 @@ namespace Stock_Market_Dashboard.Components
 
         private readonly List<string> timestamps = new List<string>();
 
-        private CompanyNewsResponse stockMarketDataAmazon;
-        private CompanyNewsResponse stockMarketDataApple;
-        private CompanyNewsResponse stockMarketDataGoogle;
+        private StockMarketResponse stockMarketDataAmazon;
+        private StockMarketResponse stockMarketDataApple;
+        private StockMarketResponse stockMarketDataGoogle;
 
         private readonly List<string> backgroundColours = new List<string>
 {

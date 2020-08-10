@@ -1,6 +1,8 @@
 using Extensions;
 using Microsoft.AspNetCore.Components;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -27,26 +29,35 @@ namespace Stock_Market_Dashboard.Data
             return StockWebhook + "?symbol=" + companyCode + "&from=" + startUnixTimestamp + "&to=" + endUnixTimestamp + "&resolution=D&token=" + APIKey;
         }
 
-        public async Task<CompanyNewsResponse> GetStockMarketDataForCompanyAsync(string companyCode, DateTime startDate, DateTime endDate)
+        public async Task<StockMarketResponse> GetStockMarketDataForCompanyAsync(string companyCode, DateTime startDate, DateTime endDate)
         {
             string path = BuildStockWebhookPath(companyCode, startDate, endDate);
-            CompanyNewsResponse response = await client.GetJsonAsync<CompanyNewsResponse>(path).ConfigureAwait(continueOnCapturedContext:false);
+            StockMarketResponse response = await client.GetJsonAsync<StockMarketResponse>(path).ConfigureAwait(continueOnCapturedContext:false);
             return response;
         }
 
         public string BuildCompanyNewsWebhookPath(string companyCode, DateTime startDate, DateTime endDate)
         {
-            long startUnixTimestamp = Conversions.ConvertDateToUnix(startDate);
-            long endUnixTimestamp = Conversions.ConvertDateToUnix(endDate);
+            //long startUnixTimestamp = Conversions.ConvertDateToUnix(startDate);
+            //long endUnixTimestamp = Conversions.ConvertDateToUnix(endDate);
+            string startUnixTimestamp = "2020-07-10";
+            string endUnixTimestamp = "2020-07-20";
 
-            return CompanyNewsWebhook + "?symbol=" + companyCode + "&from=" + startUnixTimestamp + "&to=" + endUnixTimestamp + "&resolution=D&token=" + APIKey;
+            return CompanyNewsWebhook + "?symbol=" + companyCode + "&from=" + startUnixTimestamp + "&to=" + endUnixTimestamp + "&token=" + APIKey;
         }
 
-        public async Task<CompanyNewsResponse> GetStockMarkeyCompanyNewsAsync(string companyCode, DateTime startDate, DateTime endDate)
+        public List<CompanyNewsArticle> GetStockMarketCompanyNewsAsync(string companyCode, DateTime startDate, DateTime endDate)
         {
+            List<CompanyNewsArticle> articles = new List<CompanyNewsArticle>();
             string path = BuildCompanyNewsWebhookPath(companyCode, startDate, endDate);
-            CompanyNewsResponse response = await client.GetJsonAsync<CompanyNewsResponse>(path).ConfigureAwait(continueOnCapturedContext: false);
-            return response;
+            var task = client.GetAsync(path).ContinueWith((taskwithresponse) => {
+                var response = taskwithresponse.Result;
+                var jsonString = response.Content.ReadAsStringAsync();
+                jsonString.Wait();
+                articles = JsonConvert.DeserializeObject<List<CompanyNewsArticle>>(jsonString.Result);
+            });
+            task.Wait();
+            return articles;
         }
     }
 }
